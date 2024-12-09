@@ -14,9 +14,29 @@ provider:
   runtime: nodejs20.x
   region: us-east-1
   architecture: arm64
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminGetUser
+          Resource: !GetAtt ChaparralUserPool.Arn
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+          Resource: !GetAtt AccountsTable.Arn
   deploymentMethod: direct
   environment:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
+    COGNITO_POOL_ID: !Ref ChaparralUserPool
+  httpApi:
+    authorizers:
+      CognitoAuthorizer:
+        type: jwt
+        identitySource: $request.header.Authorization
+        issuerUrl: !GetAtt ChaparralUserPool.ProviderURL
+        audience:
+          - !Ref ChaparralUserPoolClient
 
 resources:
   Resources:
@@ -69,6 +89,21 @@ resources:
           RefreshToken: hours
         AccessTokenValidity: 3
         RefreshTokenValidity: 1440 #60 days
+    AccountsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: AccountsTable
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
 
 functions:
   signUp:
@@ -95,3 +130,31 @@ functions:
       - httpApi:
           method: POST
           path: /auth/refresh-token
+  forgotPassword:
+    handler: src/functions/auth/forgotPassword.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/forgot-password
+  resetPassword:
+    handler: src/functions/auth/resetPassword.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /auth/reset-password
+  profile:
+    handler: src/functions/user/profile.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/profile
+          authorizer:
+            name: CognitoAuthorizer
+  addItemToCart:
+    handler: src/functions/user/addItemToCart.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/cart
+          authorizer:
+            name: CognitoAuthorizer
