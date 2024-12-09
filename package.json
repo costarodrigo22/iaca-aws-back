@@ -1,0 +1,12 @@
+{
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.146",
+    "@types/node": "^22.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "eslint": "8"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.699.0"
+  }
+}
