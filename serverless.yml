@@ -25,6 +25,18 @@ provider:
           Action:
             - dynamodb:PutItem
           Resource: !GetAtt AccountsTable.Arn
+        - Effect: Allow
+          Action:
+            - dynamodb:UpdateItem
+          Resource: !GetAtt AccountsTable.Arn
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+          Resource: !GetAtt AccountsTable.Arn
+        - Effect: Allow
+          Action:
+            - dynamodb:DeleteItem
+          Resource: !GetAtt AccountsTable.Arn
   deploymentMethod: direct
   environment:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
@@ -156,5 +168,37 @@ functions:
       - httpApi:
           method: POST
           path: /user/cart
+          authorizer:
+            name: CognitoAuthorizer
+  updateQuantityProductToCart:
+    handler: src/functions/user/updateQuantityProductToCart.handler
+    events:
+      - httpApi:
+          method: PUT
+          path: /user/cart
+          authorizer:
+            name: CognitoAuthorizer
+  getCartItems:
+    handler: src/functions/user/getCartItems.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/cart
+          authorizer:
+            name: CognitoAuthorizer
+  deleteCartItem:
+    handler: src/functions/user/deleteCartItem.handler
+    events:
+      - httpApi:
+          method: DELETE
+          path: /user/cart/{productCode}
+          authorizer:
+            name: CognitoAuthorizer
+  addAddress:
+    handler: src/functions/user/address/addAddress.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/address
           authorizer:
             name: CognitoAuthorizer
