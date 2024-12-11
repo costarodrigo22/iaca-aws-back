@@ -1,6 +1,7 @@
 import { cognitoClient } from "./../../libs/cognitoClient";
 import type { APIGatewayProxyEventV2 } from "aws-lambda";
 import {
+  AdminGetUserCommand,
   InitiateAuthCommand,
   NotAuthorizedException,
   UserNotConfirmedException,
@@ -29,9 +30,29 @@ export async function handler(event: APIGatewayProxyEventV2) {
       return response(401, { error: "Invalid credentials." });
     }
 
+    const userCommand = new AdminGetUserCommand({
+      UserPoolId: process.env.COGNITO_POOL_ID,
+      Username: email,
+    });
+
+    const userResponse = await cognitoClient.send(userCommand);
+
+    const userAttributes = userResponse.UserAttributes?.reduce(
+      (profileObj, { Name, Value }) => ({
+        ...profileObj,
+        [String(Name)]: Value,
+      }),
+      {} as any
+    );
+
     return response(200, {
       accessToken: AuthenticationResult.AccessToken,
       refreshToken: AuthenticationResult.RefreshToken,
+      user: {
+        id: userAttributes?.sub,
+        name: userAttributes?.given_name,
+        email: userAttributes?.email,
+      },
     });
   } catch (error) {
     if (error instanceof NotAuthorizedException) {
