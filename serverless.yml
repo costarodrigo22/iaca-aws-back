@@ -42,6 +42,9 @@ provider:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
     COGNITO_POOL_ID: !Ref ChaparralUserPool
   httpApi:
+    cors:
+      allowOrigins:
+        - "*"
     authorizers:
       CognitoAuthorizer:
         type: jwt
