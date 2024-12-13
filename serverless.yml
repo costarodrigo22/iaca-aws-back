@@ -102,7 +102,7 @@ resources:
         TokenValidityUnits:
           AccessToken: hours
           RefreshToken: hours
-        AccessTokenValidity: 3
+        AccessTokenValidity: 24
         RefreshTokenValidity: 1440 #60 days
     AccountsTable:
       Type: AWS::DynamoDB::Table
@@ -203,5 +203,45 @@ functions:
       - httpApi:
           method: POST
           path: /user/address
+          authorizer:
+            name: CognitoAuthorizer
+  getAddress:
+    handler: src/functions/user/address/getAddress.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/address
+          authorizer:
+            name: CognitoAuthorizer
+  deleteAddress:
+    handler: src/functions/user/address/deleteAddress.handler
+    events:
+      - httpApi:
+          method: DELETE
+          path: /user/address/{addressId}
+          authorizer:
+            name: CognitoAuthorizer
+  updateAddress:
+    handler: src/functions/user/address/updateAddress.handler
+    events:
+      - httpApi:
+          method: PUT
+          path: /user/address
+          authorizer:
+            name: CognitoAuthorizer
+  selecteAddress:
+    handler: src/functions/user/address/selecteAddress.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/address/select
+          authorizer:
+            name: CognitoAuthorizer
+  getSelectedAddress:
+    handler: src/functions/user/address/getSelectedAddress.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/address/select
           authorizer:
             name: CognitoAuthorizer
