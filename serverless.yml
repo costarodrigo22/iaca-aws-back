@@ -245,3 +245,19 @@ functions:
           path: /user/address/select
           authorizer:
             name: CognitoAuthorizer
+  createOrder:
+    handler: src/functions/user/orders/createOrder.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/order
+          authorizer:
+            name: CognitoAuthorizer
+  getOrders:
+    handler: src/functions/user/orders/getOrders.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/order
+          authorizer:
+            name: CognitoAuthorizer
