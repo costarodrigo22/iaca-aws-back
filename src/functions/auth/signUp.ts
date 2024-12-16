@@ -47,6 +47,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
         document: body.document,
         phone: body.phone,
         email: body.email,
+        code_omie: body.code_omie,
       },
     };
 
