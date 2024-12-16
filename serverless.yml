@@ -237,6 +237,14 @@ functions:
           path: /user/address/select
           authorizer:
             name: CognitoAuthorizer
+  deselectAllAddresses:
+    handler: src/functions/user/address/deselectAllAddresses.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/address/deselectAllAddresses
+          authorizer:
+            name: CognitoAuthorizer
   getSelectedAddress:
     handler: src/functions/user/address/getSelectedAddress.handler
     events:
