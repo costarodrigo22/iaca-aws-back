@@ -10,7 +10,7 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
     const repository = new UserRepository();
 
     try {
-      const result = await repository.getUser(userId);
+      const result = await repository.updateUser(userId);
 
       return response(200, {
         item: result,

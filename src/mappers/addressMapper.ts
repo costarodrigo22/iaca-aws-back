@@ -12,6 +12,7 @@ export function mapAddressItem(item: Record<string, any>) {
     uf: item.uf,
     reference: item.reference,
     selected: item.selected,
+    is_default: item.is_default,
   };
 }
 

@@ -48,6 +48,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
         phone: body.phone,
         email: body.email,
         code_omie: body.code_omie,
+        is_address_default_registered: false,
       },
     };
 
@@ -56,7 +57,8 @@ export async function handler(event: APIGatewayProxyEventV2) {
     await dynamoClient.send(commandPutItem).catch((error) => {
       if (error instanceof UsernameExistsException) {
         return response(409, {
-          error: "This e-email is already in use.",
+          error: "Este e-mail já está em uso.",
+          action: "resend_code",
         });
       }
     });
@@ -70,7 +72,8 @@ export async function handler(event: APIGatewayProxyEventV2) {
   } catch (error) {
     if (error instanceof UsernameExistsException) {
       return response(409, {
-        error: "This e-email is already in use.",
+        error: "Este e-mail já está em uso.",
+        action: "resend_code",
       });
     }
 

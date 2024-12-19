@@ -21,6 +21,7 @@ export interface IAddress {
   uf: string;
   reference: string;
   selected: boolean;
+  isDefault: boolean;
 }
 
 export interface IUpdateAddress extends IAddress {
@@ -57,6 +58,7 @@ export class addressRepository {
         uf: address.uf,
         reference: address.reference,
         selected: address.selected,
+        is_default: address.isDefault,
       },
     };
 

@@ -37,6 +37,11 @@ provider:
           Action:
             - dynamodb:DeleteItem
           Resource: !GetAtt AccountsTable.Arn
+        - Effect: Allow
+          Action:
+            - geo:SearchPlaceIndexForText
+            - geo:CalculateRoute
+          Resource: "*"
   deploymentMethod: direct
   environment:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
@@ -119,6 +124,16 @@ resources:
           - AttributeName: SK
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
+    PlaceIndex:
+      Type: AWS::Location::PlaceIndex
+      Properties:
+        DataSource: Here
+        IndexName: ChaparralPlaceIndex
+    RouteCalculator:
+      Type: AWS::Location::RouteCalculator
+      Properties:
+        CalculatorName: ChaparralRouteCalculator
+        DataSource: Here
 
 functions:
   signUp:
@@ -165,6 +180,20 @@ functions:
           path: /user/profile
           authorizer:
             name: CognitoAuthorizer
+  updateProfile:
+    handler: src/functions/user/updateProfile.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/update/profile
+          authorizer:
+            name: CognitoAuthorizer
+  resendVerifyCode:
+    handler: src/functions/user/resendVerifyCode.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/profile/resend-code
   addItemToCart:
     handler: src/functions/user/addItemToCart.handler
     events:
@@ -267,5 +296,13 @@ functions:
       - httpApi:
           method: GET
           path: /user/order
+          authorizer:
+            name: CognitoAuthorizer
+  calculateRoute:
+    handler: src/functions/user/route/calculateRoute.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/route
           authorizer:
             name: CognitoAuthorizer

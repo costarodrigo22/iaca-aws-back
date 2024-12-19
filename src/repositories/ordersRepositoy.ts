@@ -49,7 +49,7 @@ export class ordersRepository {
         payment_form: payment_form,
         delivery_form: delivery_form,
         order_number: orderNumber,
-        // createdAt: now.toISOString(),
+        createdAt: now.toISOString(),
       },
     };
 
@@ -62,7 +62,7 @@ export class ordersRepository {
 
       return { success: true, item: responseMapped };
     } catch (error) {
-      throw error;
+      return error;
     }
   }
 
