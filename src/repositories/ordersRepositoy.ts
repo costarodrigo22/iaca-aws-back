@@ -11,6 +11,7 @@ interface IOrder {
   total: number;
   payment_form: string;
   delivery_form: string;
+  order_number_omie: string;
 }
 
 export class ordersRepository {
@@ -34,7 +35,16 @@ export class ordersRepository {
 
     const orderNumber = `PEDIDO-${year}${month}${day}${hour}${minute}`;
 
-    const { address, delivery_form, payment_form, products, total } = order;
+    const {
+      address,
+      delivery_form,
+      payment_form,
+      products,
+      total,
+      order_number_omie,
+    } = order;
+
+    const createdAt = now.toISOString();
 
     const putParams = {
       TableName: this.tableName,
@@ -49,18 +59,29 @@ export class ordersRepository {
         payment_form: payment_form,
         delivery_form: delivery_form,
         order_number: orderNumber,
-        createdAt: now.toISOString(),
+        order_number_omie: order_number_omie,
+        createdAt,
       },
     };
 
     try {
       const command = new PutCommand(putParams);
 
-      const { Attributes } = await dynamoClient.send(command);
+      await dynamoClient.send(command);
 
-      const responseMapped = mapOrderItem(Attributes ?? {});
-
-      return { success: true, item: responseMapped };
+      return {
+        success: true,
+        item: {
+          id: orderId,
+          address: address,
+          products: products,
+          total: total,
+          payment_form: payment_form,
+          delivery_form: delivery_form,
+          order_number: orderNumber,
+          createdAt,
+        },
+      };
     } catch (error) {
       return error;
     }
@@ -88,6 +109,35 @@ export class ordersRepository {
       return { success: true, item: responseMapped };
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getOrderById(userId: string, orderId: string) {
+    const pk = `ACCOUNT#${userId}`;
+    const sk = `ORDER#${orderId}`;
+
+    try {
+      const params = {
+        TableName: this.tableName,
+        ExpressionAttributeValues: {
+          ":pk": pk,
+          ":sk": sk,
+        },
+        KeyConditionExpression: "PK = :pk AND SK = :sk",
+      };
+      const command = new QueryCommand(params);
+
+      const { Items } = await dynamoClient.send(command);
+
+      if (!Items || Items.length === 0) {
+        return { message: "Order not found" };
+      }
+
+      const responseMapped = mapOrderItem(Items[0] ?? {});
+
+      return { success: true, item: responseMapped };
+    } catch (error) {
+      return error;
     }
   }
 }

@@ -10,6 +10,7 @@ export function mapOrderItem(item: Record<string, any>) {
     payment_form: item.payment_form,
     delivery_form: item.delivery_form,
     order_number: item.order_number,
+    order_number_omie: item.order_number_omie,
   };
 }
 

@@ -282,6 +282,22 @@ functions:
           path: /user/address/select
           authorizer:
             name: CognitoAuthorizer
+  deselectAllDefault:
+    handler: src/functions/user/address/deselectAllDefault.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/address/deselectAllDefault
+          authorizer:
+            name: CognitoAuthorizer
+  selecteAddressDefault:
+    handler: src/functions/user/address/selecteAddressDefault.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/address/selecteAddressDefault
+          authorizer:
+            name: CognitoAuthorizer
   createOrder:
     handler: src/functions/user/orders/createOrder.handler
     events:
@@ -296,6 +312,14 @@ functions:
       - httpApi:
           method: GET
           path: /user/order
+          authorizer:
+            name: CognitoAuthorizer
+  getOrderById:
+    handler: src/functions/user/orders/getOrderById.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/order/{orderId}
           authorizer:
             name: CognitoAuthorizer
   calculateRoute:

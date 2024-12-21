@@ -65,11 +65,26 @@ export class addressRepository {
     try {
       const command = new PutCommand(putParams);
 
-      const { Attributes } = await dynamoClient.send(command);
+      await dynamoClient.send(command);
 
-      const responseMapped = mapAddressItem(Attributes ?? {});
-
-      return { success: true, item: responseMapped };
+      return {
+        success: true,
+        item: {
+          id: itemId,
+          cep: address.cep,
+          country: address.country,
+          street: address.street,
+          number: address.number,
+          neighborhood: address.neighborhood,
+          complement: address.complement,
+          city: address.city,
+          state: address.state,
+          uf: address.uf,
+          reference: address.reference,
+          selected: address.selected,
+          is_default: address.isDefault,
+        },
+      };
     } catch (error) {
       if (error instanceof ConditionalCheckFailedException) {
         return {
@@ -130,7 +145,7 @@ export class addressRepository {
     }
   }
 
-  async updateItemQuantity(userId: string, address: IUpdateAddress) {
+  async updateAddress(userId: string, address: IUpdateAddress) {
     const pk = `ACCOUNT#${userId}`;
     const sk = `ADDRESS#${address.id}`;
 
@@ -272,5 +287,79 @@ export class addressRepository {
     const { Items } = await dynamoClient.send(command);
 
     return Items?.length ? mapAddressItem(Items[0]) : null;
+  }
+
+  async deselectAllDefault(userId: string) {
+    const pk = `ACCOUNT#${userId}`;
+
+    const queryParams = {
+      TableName: this.tableName,
+      ExpressionAttributeValues: {
+        ":pk": pk,
+        ":addressPrefix": "ADDRESS#",
+      },
+      KeyConditionExpression: "PK = :pk AND begins_with(SK, :addressPrefix)",
+    };
+
+    const command = new QueryCommand(queryParams);
+
+    const { Items } = await dynamoClient.send(command);
+
+    const updateItems = Items?.map((item) => {
+      const sk = item.SK;
+
+      const updateParams = {
+        TableName: this.tableName,
+        Key: { PK: pk, SK: sk },
+        UpdateExpression: "SET #isDefault = :false",
+        ExpressionAttributeNames: {
+          "#isDefault": "is_default",
+        },
+        ExpressionAttributeValues: {
+          ":false": false,
+        },
+      };
+
+      return dynamoClient.send(new UpdateCommand(updateParams));
+    });
+
+    if (updateItems) {
+      await Promise.all(updateItems);
+    }
+  }
+
+  async selectAddressDefault(userId: string, addressId: string) {
+    const pk = `ACCOUNT#${userId}`;
+    const sk = `ADDRESS#${addressId}`;
+
+    try {
+      const updateParams = {
+        TableName: this.tableName,
+        Key: { PK: pk, SK: sk },
+        UpdateExpression: "SET #isDefault = :true",
+        ExpressionAttributeNames: {
+          "#isDefault": "is_default",
+        },
+        ExpressionAttributeValues: {
+          ":true": true,
+        },
+        ReturnValues: "ALL_NEW" as const,
+      };
+
+      const command = new UpdateCommand(updateParams);
+      const { Attributes } = await dynamoClient.send(command);
+
+      const responseMapped = mapAddressItem(Attributes ?? {});
+
+      return { success: true, item: responseMapped };
+    } catch (error) {
+      if (error.name instanceof ConditionalCheckFailedException) {
+        return {
+          success: false,
+          message: "Endereço já existe.",
+        };
+      }
+      throw error;
+    }
   }
 }

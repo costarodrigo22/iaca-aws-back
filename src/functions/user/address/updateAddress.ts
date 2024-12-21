@@ -20,6 +20,7 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
     reference,
     id,
     selected,
+    isDefault,
   } = bodyParser(event.body);
 
   if (!cep) {
@@ -37,7 +38,7 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
   const repository = new addressRepository();
 
   try {
-    const result = await repository.updateItemQuantity(userId, {
+    const result = await repository.updateAddress(userId, {
       cep,
       city,
       complement,
@@ -50,6 +51,7 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
       street,
       uf,
       selected,
+      isDefault,
     });
 
     return response(200, {
