@@ -17,6 +17,7 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
     total: body.total,
     payment_form: body.payment_form,
     delivery_form: body.delivery_form,
+    order_number_omie: body.order_number_omie,
   };
 
   try {

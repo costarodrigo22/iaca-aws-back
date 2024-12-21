@@ -222,8 +222,16 @@ functions:
     handler: src/functions/user/deleteCartItem.handler
     events:
       - httpApi:
-          method: DELETE
+          method: GET
           path: /user/cart/{productCode}
+          authorizer:
+            name: CognitoAuthorizer
+  clearCart:
+    handler: src/functions/user/cart/clearCart.handler
+    events:
+      - httpApi:
+          method: DELETE
+          path: /user/cart/clearCart
           authorizer:
             name: CognitoAuthorizer
   addAddress:

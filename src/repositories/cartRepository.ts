@@ -148,4 +148,46 @@ export class CartRepository {
       throw new Error("Erro ao deletar o item do carrinho.");
     }
   }
+
+  async clearCart(userId: string) {
+    const pk = `ACCOUNT#${userId}`;
+
+    try {
+      const params = {
+        TableName: this.tableName,
+        KeyConditionExpression: "PK = :pk and begins_with(SK, :skPrefix)",
+        ExpressionAttributeValues: {
+          ":pk": pk,
+          ":skPrefix": "CART#",
+        },
+      };
+
+      const command = new QueryCommand(params);
+
+      const { Items } = await dynamoClient.send(command);
+
+      if (!Items || Items.length === 0) {
+        return { success: true, message: "Carrinho já está vazio." };
+      }
+
+      const deletePromises = Items?.map((item) => {
+        const deleteParams = {
+          TableName: this.tableName,
+          Key: {
+            PK: pk,
+            SK: item.SK,
+          },
+        };
+
+        const commandDelete = new DeleteCommand(deleteParams);
+        return dynamoClient.send(commandDelete);
+      });
+
+      await Promise.all(deletePromises);
+
+      return { message: "Itens do carrinho removidos com sucesso." };
+    } catch (error) {
+      throw new Error(`Erro ao limpar o carrinho: ${error}`);
+    }
+  }
 }
