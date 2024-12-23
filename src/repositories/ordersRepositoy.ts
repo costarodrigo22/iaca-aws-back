@@ -24,7 +24,7 @@ export class ordersRepository {
   async addOrder(userId: string, order: IOrder) {
     const orderId = uuidv4();
     const pk = `ACCOUNT#${userId}`;
-    const sk = `ORDER#${orderId}`;
+    const sk = `ORDER#${order.order_number_omie}`;
 
     const now = new Date();
     const year = now.getFullYear();
