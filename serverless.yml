@@ -42,10 +42,17 @@ provider:
             - geo:SearchPlaceIndexForText
             - geo:CalculateRoute
           Resource: "*"
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource: arn:aws:s3:::chaparral-avatar-bucket/*
   deploymentMethod: direct
   environment:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
     COGNITO_POOL_ID: !Ref ChaparralUserPool
+    AVATAR_BUCKET: !Ref AvatarBucket
   httpApi:
     cors:
       allowOrigins:
@@ -134,6 +141,39 @@ resources:
       Properties:
         CalculatorName: ChaparralRouteCalculator
         DataSource: Here
+    AvatarBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: chaparral-avatar-bucket
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+                - PUT
+                - DELETE
+                - POST
+              AllowedOrigins:
+                - "*"
+              AllowedHeaders:
+                - "*"
+              MaxAge: 3000
+        LifecycleConfiguration:
+          Rules:
+            - Status: Enabled
+              ExpirationInDays: 365
+    # AvatarBucketPolicy:
+    #   Type: AWS::S3::BucketPolicy
+    #   Properties:
+    #     Bucket: !Ref AvatarBucket
+    #     PolicyDocument:
+    #       Statement:
+    #         - Effect: Allow
+    #           Action:
+    #             - "s3:GetObject"
+    #             - "s3:PutObject"
+    #             - "s3:DeleteObject"
+    #           Resource: !Join ["", ["arn:aws:s3:::", !Ref AvatarBucket, "/*"]]
+    #           Principal: "*"
 
 functions:
   signUp:
@@ -336,5 +376,13 @@ functions:
       - httpApi:
           method: POST
           path: /user/route
+          authorizer:
+            name: CognitoAuthorizer
+  generatePresignedUrlAvatar:
+    handler: src/functions/user/profile/generatePresignedUrlAvatar.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /user/avatar/presigned-url
           authorizer:
             name: CognitoAuthorizer
