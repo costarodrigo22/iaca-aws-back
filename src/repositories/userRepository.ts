@@ -65,4 +65,6 @@ export class UserRepository {
       };
     }
   }
+
+  async updateAvatar(userId: string) {}
 }

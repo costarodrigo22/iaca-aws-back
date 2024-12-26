@@ -49,6 +49,7 @@ export async function handler(event: APIGatewayProxyEventV2) {
         email: body.email,
         code_omie: body.code_omie,
         is_address_default_registered: false,
+        avatarUrl: "",
       },
     };
 

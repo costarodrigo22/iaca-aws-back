@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { bodyParser } from "../../../utils/bodyParser";
@@ -9,22 +9,16 @@ import { s3Client } from "../../../libs/s3Client";
 export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
   const userId = event.requestContext.authorizer.jwt.claims.sub as string;
 
-  const { fileName } = bodyParser(event.body);
+  const key = `${userId}-Avatar`;
 
   const bucketName = process.env.AVATAR_BUCKET;
 
-  if (!fileName) {
-    return response(400, { error: "Nome do arquivo é obriatório." });
-  }
-
-  const fileKey = `${userId}-Avatar`;
-
-  const command = new PutObjectCommand({
+  const command = new GetObjectCommand({
     Bucket: bucketName,
-    Key: fileKey,
+    Key: key,
   });
 
-  const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 });
+  const signedUrl = await getSignedUrl(s3Client, command);
 
   return response(200, { signedUrl });
 }

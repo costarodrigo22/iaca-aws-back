@@ -161,20 +161,6 @@ resources:
           Rules:
             - Status: Enabled
               ExpirationInDays: 365
-    # AvatarBucketPolicy:
-    #   Type: AWS::S3::BucketPolicy
-    #   Properties:
-    #     Bucket: !Ref AvatarBucket
-    #     PolicyDocument:
-    #       Statement:
-    #         - Effect: Allow
-    #           Action:
-    #             - "s3:GetObject"
-    #             - "s3:PutObject"
-    #             - "s3:DeleteObject"
-    #           Resource: !Join ["", ["arn:aws:s3:::", !Ref AvatarBucket, "/*"]]
-    #           Principal: "*"
-
 functions:
   signUp:
     handler: src/functions/auth/signUp.handler
@@ -386,3 +372,18 @@ functions:
           path: /user/avatar/presigned-url
           authorizer:
             name: CognitoAuthorizer
+  generatePresignedUrlGetAvatar:
+    handler: src/functions/user/profile/generatePresignedUrlGetAvatar.handler
+    events:
+      - httpApi:
+          method: GET
+          path: /user/avatar/presigned-url
+          authorizer:
+            name: CognitoAuthorizer
+  updateAvatarTrigger:
+    handler: src/functions/user/profile/updateAvatarTrigger.handler
+    events:
+      - s3:
+          bucket: !Ref AvatarBucket
+          event: s3:ObjectCreated:Put
+          existing: true

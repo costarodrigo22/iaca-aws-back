@@ -7,6 +7,7 @@ export function userMapperItem(items: Record<string, any>) {
     name: items[0].name,
     phone: items[0].phone,
     is_address_default_registered: items[0].is_address_default_registered,
+    avatarKey: items[0].avatarKey,
   };
 }
 
