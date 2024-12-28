@@ -43,16 +43,22 @@ provider:
             - geo:CalculateRoute
           Resource: "*"
         - Effect: Allow
+          # Sid: PublicReadGetObject
           Action:
+            - s3:ListBucket
             - s3:GetObject
             - s3:PutObject
             - s3:DeleteObject
-          Resource: arn:aws:s3:::chaparral-avatar-bucket/*
+          Resource:
+            - arn:aws:s3:::chaparral-avatar-bucket
+            - arn:aws:s3:::chaparral-avatar-bucket/*
   deploymentMethod: direct
   environment:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
     COGNITO_POOL_ID: !Ref ChaparralUserPool
     AVATAR_BUCKET: !Ref AvatarBucket
+    CLOUDFRONT_URL: ${env:CLOUDFRONT_URL}
+    CLOUDFRONT_DISTRIBUTION_ID: ${env:CLOUDFRONT_DISTRIBUTION_ID}
   httpApi:
     cors:
       allowOrigins:
@@ -378,6 +384,14 @@ functions:
       - httpApi:
           method: GET
           path: /user/avatar/presigned-url
+          authorizer:
+            name: CognitoAuthorizer
+  deleteItemBucket:
+    handler: src/functions/user/profile/deleteItemBucket.handler
+    events:
+      - httpApi:
+          method: DELETE
+          path: /user/avatar/deleteItemBucket
           authorizer:
             name: CognitoAuthorizer
   updateAvatarTrigger:

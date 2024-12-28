@@ -1,5 +1,5 @@
 export function calculateFreightRate(distance: number): number {
-  if (distance <= 1) return 6.0;
+  if (distance < 1) return 6.0;
   if (distance <= 2.4) return 7.0;
   if (distance <= 3.2) return 8.0;
   if (distance <= 4) return 9.0;

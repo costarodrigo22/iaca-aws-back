@@ -1,3 +1,5 @@
+import { cloudFrontClient } from "./../../../libs/cloudFrontClient";
+import { CreateInvalidationCommand } from "@aws-sdk/client-cloudfront";
 import { APIGatewayProxyEventV2WithJWTAuthorizer } from "aws-lambda";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -17,11 +19,12 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
     return response(400, { error: "Nome do arquivo é obriatório." });
   }
 
-  const fileKey = `${userId}-Avatar`;
+  const newFileKey = `${userId}-Avatar-${Date.now()}`;
 
   const command = new PutObjectCommand({
     Bucket: bucketName,
-    Key: fileKey,
+    Key: newFileKey,
+    CacheControl: "no-cache",
   });
 
   const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 });
