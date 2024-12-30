@@ -401,3 +401,11 @@ functions:
           bucket: !Ref AvatarBucket
           event: s3:ObjectCreated:Put
           existing: true
+  cognitoCustomMessage:
+    handler: src/functions/user/profile/cognitoCustomMessage.handler
+    events:
+      - cognitoUserPool:
+          pool: ChaparralUserPool
+          trigger: CustomMessage
+          existing: true
+          forceDeploy: true
