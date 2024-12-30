@@ -24,7 +24,6 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: newFileKey,
-    CacheControl: "no-cache",
   });
 
   const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 });
