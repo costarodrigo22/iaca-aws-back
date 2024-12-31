@@ -394,6 +394,12 @@ functions:
           path: /user/avatar/deleteItemBucket
           authorizer:
             name: CognitoAuthorizer
+  webHookOmiePayment:
+    handler: src/functions/omie/webHookOmiePayment.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /omie/payments/callback
   updateAvatarTrigger:
     handler: src/functions/user/profile/updateAvatarTrigger.handler
     events:
