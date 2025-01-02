@@ -1,4 +1,4 @@
-import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { IUpdateAddress } from "./addressRepository";
 import { IProduct } from "./cartRepository";
 import { v4 as uuidv4 } from "uuid";
@@ -11,6 +11,7 @@ interface IOrder {
   total: number;
   payment_form: string;
   delivery_form: string;
+  status: string;
   order_number_omie: string;
 }
 
@@ -42,6 +43,7 @@ export class ordersRepository {
       products,
       total,
       order_number_omie,
+      status,
     } = order;
 
     const createdAt = now.toISOString();
@@ -60,6 +62,7 @@ export class ordersRepository {
         delivery_form: delivery_form,
         order_number: orderNumber,
         order_number_omie: order_number_omie,
+        status,
         createdAt,
       },
     };
@@ -79,6 +82,7 @@ export class ordersRepository {
           payment_form: payment_form,
           delivery_form: delivery_form,
           order_number: orderNumber,
+          status,
           createdAt,
         },
       };
@@ -138,6 +142,31 @@ export class ordersRepository {
       return { success: true, item: responseMapped };
     } catch (error) {
       return error;
+    }
+  }
+
+  async updateOrder(orderId: string, userId: string, newStatus: string) {
+    const pk = `ACCOUNT#${userId}`;
+    const sk = `ORDER#${orderId}`;
+
+    try {
+      const params = {
+        TableName: this.tableName,
+        Key: {
+          PK: pk,
+          SK: sk,
+        },
+        UpdateExpression: "SET status = :newStatus",
+        ExpressionAttributeValues: {
+          ":newStatus": newStatus,
+        },
+      };
+
+      const command = new UpdateCommand(params);
+
+      await dynamoClient.send(command);
+    } catch (error) {
+      throw error;
     }
   }
 }

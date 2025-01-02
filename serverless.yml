@@ -52,6 +52,16 @@ provider:
           Resource:
             - arn:aws:s3:::chaparral-avatar-bucket
             - arn:aws:s3:::chaparral-avatar-bucket/*
+        - Effect: Allow
+          Action:
+            - sqs:SendMessage
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueAttributes
+          Resource:
+            Fn::GetAtt:
+              - OrderQueue
+              - Arn
   deploymentMethod: direct
   environment:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
@@ -59,6 +69,7 @@ provider:
     AVATAR_BUCKET: !Ref AvatarBucket
     CLOUDFRONT_URL: ${env:CLOUDFRONT_URL}
     CLOUDFRONT_DISTRIBUTION_ID: ${env:CLOUDFRONT_DISTRIBUTION_ID}
+    QUEUE_URL: ${env:QUEUE_URL}
   httpApi:
     cors:
       allowOrigins:
@@ -167,6 +178,16 @@ resources:
           Rules:
             - Status: Enabled
               ExpirationInDays: 365
+    OrderQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: OrderQueue
+        VisibilityTimeout: 30 #tempo em segundos que o consumer tem para resolver a mensagem e deleta-la
+        DelaySeconds: 0 #tempo que a mensagem fica visivel para os consumers
+        MessageRetentionPeriod: 86400 #tempo que a mensagem fica na fila caso nenhum consumer pege-a
+        MaximumMessageSize: 262144 # tamanho da mensagem (256kb)
+        ReceiveMessageWaitTimeSeconds: 20 #tempo que o SQS demora para entregar a mensagem para o consumer (evita buscas constantes)
+        SqsManagedSseEnabled: true # Configuração de criptografia SSE-SQS
 functions:
   signUp:
     handler: src/functions/auth/signUp.handler
@@ -399,7 +420,7 @@ functions:
     events:
       - httpApi:
           method: POST
-          path: /omie/payments/callback
+          path: /omie/payments/callback/{orderId}/{userId}
   updateAvatarTrigger:
     handler: src/functions/user/profile/updateAvatarTrigger.handler
     events:
@@ -415,3 +436,13 @@ functions:
           trigger: CustomMessage
           existing: true
           forceDeploy: true
+  consumerQueuePayment:
+    handler: src/functions/omie/consumerQueuePayment.handler
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - OrderQueue
+              - Arn
+          batchSize: 10
+          maximumBatchingWindow: 5
