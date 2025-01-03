@@ -11,7 +11,7 @@ interface IOrder {
   total: number;
   payment_form: string;
   delivery_form: string;
-  status: string;
+  orderStatus: string;
   order_number_omie: string;
 }
 
@@ -43,7 +43,7 @@ export class ordersRepository {
       products,
       total,
       order_number_omie,
-      status,
+      orderStatus,
     } = order;
 
     const createdAt = now.toISOString();
@@ -62,7 +62,7 @@ export class ordersRepository {
         delivery_form: delivery_form,
         order_number: orderNumber,
         order_number_omie: order_number_omie,
-        status,
+        orderStatus,
         createdAt,
       },
     };
@@ -156,7 +156,7 @@ export class ordersRepository {
           PK: pk,
           SK: sk,
         },
-        UpdateExpression: "SET status = :newStatus",
+        UpdateExpression: "SET orderStatus = :newStatus",
         ExpressionAttributeValues: {
           ":newStatus": newStatus,
         },
