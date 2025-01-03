@@ -4,6 +4,7 @@
     "@aws-sdk/client-dynamodb": "^3.705.0",
     "@aws-sdk/client-location": "^3.713.0",
     "@aws-sdk/client-s3": "^3.717.0",
+    "@aws-sdk/client-ses": "^3.721.0",
     "@aws-sdk/client-sqs": "^3.716.0",
     "@aws-sdk/lib-dynamodb": "^3.705.0",
     "@aws-sdk/s3-request-presigner": "^3.717.0",

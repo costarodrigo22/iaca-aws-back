@@ -43,7 +43,6 @@ provider:
             - geo:CalculateRoute
           Resource: "*"
         - Effect: Allow
-          # Sid: PublicReadGetObject
           Action:
             - s3:ListBucket
             - s3:GetObject
@@ -62,6 +61,10 @@ provider:
             Fn::GetAtt:
               - OrderQueue
               - Arn
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+          Resource: "*"
   deploymentMethod: direct
   environment:
     COGNITO_CLIENT_ID: !Ref ChaparralUserPoolClient
@@ -420,7 +423,13 @@ functions:
     events:
       - httpApi:
           method: POST
-          path: /omie/payments/callback/{orderId}/{userId}
+          path: /omie/payments/callback/{orderId}/{userId}/{email}/{userName}/{codeOrder}
+  sendMail:
+    handler: src/functions/mail/sendMail.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /send
   updateAvatarTrigger:
     handler: src/functions/user/profile/updateAvatarTrigger.handler
     events:
