@@ -82,7 +82,7 @@ export class ordersRepository {
           payment_form: payment_form,
           delivery_form: delivery_form,
           order_number: orderNumber,
-          status,
+          orderStatus,
           createdAt,
         },
       };

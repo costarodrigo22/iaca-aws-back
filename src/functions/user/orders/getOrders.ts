@@ -14,6 +14,7 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
       item: result,
     });
   } catch (error) {
+    console.log("erro: ", error);
     return response(500, {
       message: "Erro ao listar os pedidos.",
       error,
