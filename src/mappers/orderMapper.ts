@@ -12,6 +12,7 @@ export function mapOrderItem(item: Record<string, any>) {
     order_number: item.order_number,
     order_number_omie: item.order_number_omie,
     orderStatus: item.orderStatus,
+    createdAt: item.createdAt,
   };
 }
 
