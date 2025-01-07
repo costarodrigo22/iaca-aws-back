@@ -18,6 +18,9 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
     payment_form: body.payment_form,
     delivery_form: body.delivery_form,
     order_number_omie: body.order_number_omie,
+    id_pix_omie: body.id_pix_omie,
+    order_code_omie: body.order_code_omie,
+    freight: body.freight,
     orderStatus: "Aguardando pagamento",
   };
 

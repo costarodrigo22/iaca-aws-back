@@ -13,6 +13,9 @@ interface IOrder {
   delivery_form: string;
   orderStatus: string;
   order_number_omie: string;
+  order_code_omie: string;
+  id_pix_omie: string;
+  freight: number;
 }
 
 export class ordersRepository {
@@ -43,7 +46,10 @@ export class ordersRepository {
       products,
       total,
       order_number_omie,
+      id_pix_omie,
       orderStatus,
+      order_code_omie,
+      freight,
     } = order;
 
     const createdAt = now.toISOString();
@@ -62,6 +68,9 @@ export class ordersRepository {
         delivery_form: delivery_form,
         order_number: orderNumber,
         order_number_omie: order_number_omie,
+        order_code_omie,
+        id_pix_omie,
+        freight,
         orderStatus,
         createdAt,
       },
@@ -82,7 +91,10 @@ export class ordersRepository {
           payment_form: payment_form,
           delivery_form: delivery_form,
           order_number: orderNumber,
+          id_pix_omie,
+          order_code_omie,
           orderStatus,
+          freight,
           createdAt,
         },
       };

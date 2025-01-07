@@ -11,6 +11,9 @@ export function mapOrderItem(item: Record<string, any>) {
     delivery_form: item.delivery_form,
     order_number: item.order_number,
     order_number_omie: item.order_number_omie,
+    id_pix_omie: item.id_pix_omie,
+    order_code_omie: item.order_code_omie,
+    freight: item.freight,
     orderStatus: item.orderStatus,
     createdAt: item.createdAt,
   };
