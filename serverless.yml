@@ -32,7 +32,9 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:Query
-          Resource: !GetAtt AccountsTable.Arn
+          Resource:
+            - !GetAtt AccountsTable.Arn
+            - !Sub arn:aws:dynamodb:us-east-1:901381315351:table/AccountsTable/index/TypeIndex
         - Effect: Allow
           Action:
             - dynamodb:DeleteItem
@@ -145,12 +147,21 @@ resources:
             AttributeType: S
           - AttributeName: SK
             AttributeType: S
+          - AttributeName: type
+            AttributeType: S
         KeySchema:
           - AttributeName: PK
             KeyType: HASH
           - AttributeName: SK
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: TypeIndex # Nome do GSI
+            KeySchema:
+              - AttributeName: type
+                KeyType: HASH # Atributo de Partição para o GSI
+            Projection:
+              ProjectionType: ALL # Inclui todas as colunas no índice
     PlaceIndex:
       Type: AWS::Location::PlaceIndex
       Properties:
@@ -455,3 +466,11 @@ functions:
               - Arn
           batchSize: 10
           maximumBatchingWindow: 5
+  updateStatusDelivey:
+    handler: src/functions/cron/updateStatusDelivey.handler
+    events:
+      - eventBridge:
+          schedule: cron(0 8,10,12,14,16,18,20,22 * * ? *)
+
+          #cron(0 8,10,12,14,16,18,20,22 * * ? *)
+          #rate(1 minute)

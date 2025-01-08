@@ -20,5 +20,5 @@ export function mapOrderItem(item: Record<string, any>) {
 }
 
 export function mapOrderItems(items: Record<string, any>[]) {
-  return items.map(mapOrderItem);
+  return items?.map(mapOrderItem);
 }
