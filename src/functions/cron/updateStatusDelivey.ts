@@ -55,6 +55,10 @@ export async function handler() {
               console.log(
                 `Status do pedido ${orderCodeOmie} atualizado para "entregue"`
               );
+            } else {
+              console.log(
+                `Status do pedido ${orderCodeOmie} NÃO FOI atualizado para "entregue"`
+              );
             }
           } catch (apiOmieError) {
             console.error(

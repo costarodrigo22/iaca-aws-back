@@ -17,7 +17,7 @@ export async function handler(event: SQSEvent) {
         "Pagamento realizado"
       );
 
-      const trackingUrl = `http://localhost:3000/TrackOrder/${body.orderId}/${body.codeOrder}`;
+      const trackingUrl = `https://iacapuro.com.br/TrackOrder/${body.orderId}/${body.codeOrder}`;
 
       const sendEmailCommand = new SendEmailCommand({
         Source: "contato@iacapuro.com.br",
@@ -44,10 +44,18 @@ export async function handler(event: SQSEvent) {
 
       await sesClient.send(sendEmailCommand);
 
+      console.log(
+        `fila consumida com sucesso: ${{
+          orderId: body.orderId,
+          userId: body.userId,
+        }}`
+      );
+
       return {
         statusCode: 200,
       };
     } catch (error) {
+      console.log(`deu zica no consumer: ${error}`);
       return { error };
     }
   });

@@ -1,4 +1,3 @@
-org: studyaws
 service: chaparral
 
 build:
@@ -34,7 +33,7 @@ provider:
             - dynamodb:Query
           Resource:
             - !GetAtt AccountsTable.Arn
-            - !Sub arn:aws:dynamodb:us-east-1:901381315351:table/AccountsTable/index/TypeIndex
+            - !Sub arn:aws:dynamodb:us-east-1:396608794095:table/AccountsTable/index/TypeIndex
         - Effect: Allow
           Action:
             - dynamodb:DeleteItem
@@ -51,8 +50,8 @@ provider:
             - s3:PutObject
             - s3:DeleteObject
           Resource:
-            - arn:aws:s3:::chaparral-avatar-bucket
-            - arn:aws:s3:::chaparral-avatar-bucket/*
+            - arn:aws:s3:::chaparral-avatar-bucket-iaca
+            - arn:aws:s3:::chaparral-avatar-bucket-iaca/*
         - Effect: Allow
           Action:
             - sqs:SendMessage
@@ -175,7 +174,7 @@ resources:
     AvatarBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: chaparral-avatar-bucket
+        BucketName: chaparral-avatar-bucket-iaca
         CorsConfiguration:
           CorsRules:
             - AllowedMethods:
@@ -289,7 +288,7 @@ functions:
     handler: src/functions/user/deleteCartItem.handler
     events:
       - httpApi:
-          method: GET
+          method: DELETE
           path: /user/cart/{productCode}
           authorizer:
             name: CognitoAuthorizer

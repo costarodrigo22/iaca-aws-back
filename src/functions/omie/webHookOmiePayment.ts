@@ -24,8 +24,20 @@ export async function handler(event: APIGatewayProxyEventV2) {
 
     await sqsClient.send(command);
 
+    console.log(
+      `mensagem adicionada a fila: ${JSON.stringify({
+        orderId,
+        userId,
+        email,
+        userName,
+        codeOrder,
+      })}`
+    );
+
     return response(201, { message: "Compra adicionada a fila!!" });
   } catch (error) {
+    console.log(`deu zica no webHook: ${error}`);
+
     return response(400, {
       message: "Algo deu errado ao adicionar o pedido a fila.",
     });

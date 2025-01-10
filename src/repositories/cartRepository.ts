@@ -187,6 +187,7 @@ export class CartRepository {
 
       return { message: "Itens do carrinho removidos com sucesso." };
     } catch (error) {
+      console.log(`erro ao deletar o carrinho <repository>: ${error}`);
       throw new Error(`Erro ao limpar o carrinho: ${error}`);
     }
   }

@@ -11,7 +11,7 @@ export async function handler(event: CustomMessageTriggerEvent) {
     <br/> <br/>
     Use este código para confirmar a sua conta <strong>${code}</strong> e acesse o link:
     <br />
-    http://localhost:3000/confirm-account/?email=${encodeURIComponent(email)}`;
+    https://iacapuro.com.br/confirm-account?email=${encodeURIComponent(email)}`;
   }
 
   if (event.triggerSource === "CustomMessage_ForgotPassword") {
@@ -19,7 +19,7 @@ export async function handler(event: CustomMessageTriggerEvent) {
     event.response.emailMessage = `<h1>Olá ${name}</h1>
     Para recuper a sua conta use o código <strong>${code}</strong> e acesse o link:
     <br />
-    http://localhost:3000/reset-password/?email=${encodeURIComponent(email)}`;
+    https://iacapuro.com.br/reset-password/?email=${encodeURIComponent(email)}`;
   }
 
   return event;

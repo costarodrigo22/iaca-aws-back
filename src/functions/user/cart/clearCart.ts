@@ -14,6 +14,8 @@ export async function handler(event: APIGatewayProxyEventV2WithJWTAuthorizer) {
       message: result.message,
     });
   } catch (error) {
+    console.log(`erro ao deletar o carrinho: ${error}`);
+
     return response(500, {
       message: error,
     });
